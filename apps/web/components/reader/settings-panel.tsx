@@ -182,6 +182,10 @@ export function SettingsPanel({
             <span className="text-[hsl(var(--muted-foreground))]">Settings</span>
           </div>
           <div className="flex items-center gap-2">
+            <Kbd>t</Kbd>
+            <span className="text-[hsl(var(--muted-foreground))]">Text preview</span>
+          </div>
+          <div className="flex items-center gap-2">
             <Kbd>d</Kbd>
             <span className="text-[hsl(var(--muted-foreground))]">Dark mode</span>
           </div>

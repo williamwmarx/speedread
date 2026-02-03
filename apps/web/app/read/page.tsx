@@ -7,6 +7,7 @@ import { RSVPDisplay } from '@/components/reader/rsvp-display'
 import { ControlsBar } from '@/components/reader/controls-bar'
 import { ProgressBar } from '@/components/reader/progress-bar'
 import { SettingsPanel } from '@/components/reader/settings-panel'
+import { TextPreview } from '@/components/reader/text-preview'
 import { useReader } from '@/hooks/use-reader'
 import { useSettings } from '@/hooks/use-settings'
 import { useKeyboard } from '@/hooks/use-keyboard'
@@ -24,8 +25,10 @@ function ReaderContent(): React.ReactElement {
   const reader = useReader(settings)
 
   const [settingsOpen, setSettingsOpen] = useState(false)
+  const [previewOpen, setPreviewOpen] = useState(false)
   const [controlsVisible, setControlsVisible] = useState(true)
   const [lastActivity, setLastActivity] = useState(Date.now())
+
 
   // Load text from localStorage
   useEffect(() => {
@@ -120,14 +123,28 @@ function ReaderContent(): React.ReactElement {
     updateSettings({ wpm: newWpm })
   }, [reader, updateSettings])
 
+  // Toggle text preview (playback continues normally)
+  const togglePreview = useCallback(() => {
+    setPreviewOpen((prev) => !prev)
+  }, [])
+
+  const handlePreviewSeek = useCallback(
+    (index: number) => {
+      reader.seek(index)
+    },
+    [reader]
+  )
+
   // Keyboard shortcuts
   useKeyboard({
     reader,
     onToggleSettings: () => setSettingsOpen((prev) => !prev),
+    onTogglePreview: togglePreview,
     onToggleDarkMode: () => setTheme(theme === 'dark' ? 'light' : 'dark'),
     onExit: () => router.push('/'),
     onToggleFullscreen: toggleFullscreen,
     onCycleSpeed: cycleSpeed,
+    previewOpen,
     enabled: !settingsOpen,
   })
 
@@ -152,6 +169,17 @@ function ReaderContent(): React.ReactElement {
           onToggle={reader.toggle}
           onJumpSentences={reader.jumpSentences}
         />
+
+        {/* Text preview toggle */}
+        <button
+          onClick={togglePreview}
+          className="absolute right-4 top-4 rounded-md p-2 text-[hsl(var(--muted-foreground))] transition-colors hover:bg-[hsl(var(--muted))] hover:text-[hsl(var(--foreground))]"
+          title="Text preview (t)"
+        >
+          <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h7" />
+          </svg>
+        </button>
       </div>
 
       {/* Bottom controls */}
@@ -177,6 +205,15 @@ function ReaderContent(): React.ReactElement {
           visible={controlsVisible || settingsOpen}
         />
       </div>
+
+      {/* Text preview overlay */}
+      <TextPreview
+        tokens={reader.tokens}
+        currentIndex={reader.currentIndex}
+        open={previewOpen}
+        onClose={togglePreview}
+        onSeek={handlePreviewSeek}
+      />
 
       {/* Settings panel */}
       <SettingsPanel

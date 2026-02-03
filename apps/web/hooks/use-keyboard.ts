@@ -6,20 +6,24 @@ import type { UseReaderReturn } from './use-reader'
 interface UseKeyboardOptions {
   reader: UseReaderReturn
   onToggleSettings: () => void
+  onTogglePreview: () => void
   onToggleDarkMode: () => void
   onExit: () => void
   onToggleFullscreen: () => void
   onCycleSpeed: () => void
+  previewOpen?: boolean
   enabled?: boolean
 }
 
 export function useKeyboard({
   reader,
   onToggleSettings,
+  onTogglePreview,
   onToggleDarkMode,
   onExit,
   onToggleFullscreen,
   onCycleSpeed,
+  previewOpen = false,
   enabled = true,
 }: UseKeyboardOptions): void {
   useEffect(() => {
@@ -28,6 +32,15 @@ export function useKeyboard({
     function handleKeyDown(e: KeyboardEvent) {
       // Ignore if typing in an input
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+        return
+      }
+
+      // When preview is open, only t and Escape are active
+      if (previewOpen) {
+        if (e.key === 't' || e.key === 'Escape') {
+          e.preventDefault()
+          onTogglePreview()
+        }
         return
       }
 
@@ -61,6 +74,11 @@ export function useKeyboard({
         case 's':
           e.preventDefault()
           onToggleSettings()
+          break
+
+        case 't':
+          e.preventDefault()
+          onTogglePreview()
           break
 
         case 'd':
@@ -102,5 +120,5 @@ export function useKeyboard({
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [reader, onToggleSettings, onToggleDarkMode, onExit, onToggleFullscreen, onCycleSpeed, enabled])
+  }, [reader, onToggleSettings, onTogglePreview, onToggleDarkMode, onExit, onToggleFullscreen, onCycleSpeed, previewOpen, enabled])
 }
