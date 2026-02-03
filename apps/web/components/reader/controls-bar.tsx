@@ -1,9 +1,13 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
-import { Kbd } from '@/components/ui/kbd'
 import { cn } from '@/lib/cn'
 import type { ReaderState } from '@speedread/shared'
+
+const SPEED_PRESETS = [
+  { label: 'Normal', wpm: 400 },
+  { label: 'Fast', wpm: 600 },
+] as const
 
 interface ControlsBarProps {
   status: ReaderState
@@ -12,7 +16,7 @@ interface ControlsBarProps {
   onRestart: () => void
   onPrev: () => void
   onNext: () => void
-  onWpmChange: (delta: number) => void
+  onWpmSet: (wpm: number) => void
   onSettingsToggle: () => void
   onExit: () => void
   visible: boolean
@@ -25,13 +29,22 @@ export function ControlsBar({
   onRestart,
   onPrev,
   onNext,
-  onWpmChange,
+  onWpmSet,
   onSettingsToggle,
   onExit,
   visible,
 }: ControlsBarProps): React.ReactElement {
   const isPlaying = status === 'playing'
   const isFinished = status === 'finished'
+
+  // Find current preset or default to first
+  const currentPreset = SPEED_PRESETS.find((p) => p.wpm === wpm) ?? SPEED_PRESETS[0]
+  const currentIndex = SPEED_PRESETS.indexOf(currentPreset)
+
+  const cycleSpeed = () => {
+    const nextIndex = (currentIndex + 1) % SPEED_PRESETS.length
+    onWpmSet(SPEED_PRESETS[nextIndex].wpm)
+  }
 
   return (
     <div
@@ -95,21 +108,17 @@ export function ControlsBar({
         </Button>
       </div>
 
-      {/* Right: WPM and settings */}
+      {/* Right: Speed preset and settings */}
       <div className="flex items-center gap-2">
-        <div className="flex items-center gap-1">
-          <Button variant="ghost" size="icon-sm" onClick={() => onWpmChange(-25)} title="Decrease WPM (↓)">
-            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
-            </svg>
-          </Button>
-          <span className="min-w-[4ch] text-center text-sm font-medium tabular-nums">{wpm}</span>
-          <Button variant="ghost" size="icon-sm" onClick={() => onWpmChange(25)} title="Increase WPM (↑)">
-            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
-          </Button>
-        </div>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={cycleSpeed}
+          className="min-w-[5rem] text-sm"
+          title="Cycle speed preset"
+        >
+          {currentPreset.label}
+        </Button>
 
         <Button variant="ghost" size="icon-sm" onClick={onSettingsToggle} title="Settings (s)">
           <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

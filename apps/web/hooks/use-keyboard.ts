@@ -9,6 +9,7 @@ interface UseKeyboardOptions {
   onToggleDarkMode: () => void
   onExit: () => void
   onToggleFullscreen: () => void
+  onCycleSpeed: () => void
   enabled?: boolean
 }
 
@@ -18,6 +19,7 @@ export function useKeyboard({
   onToggleDarkMode,
   onExit,
   onToggleFullscreen,
+  onCycleSpeed,
   enabled = true,
 }: UseKeyboardOptions): void {
   useEffect(() => {
@@ -46,13 +48,9 @@ export function useKeyboard({
           break
 
         case 'ArrowUp':
-          e.preventDefault()
-          reader.setWpm(reader.wpm + 25)
-          break
-
         case 'ArrowDown':
           e.preventDefault()
-          reader.setWpm(reader.wpm - 25)
+          onCycleSpeed()
           break
 
         case 'r':
@@ -104,5 +102,5 @@ export function useKeyboard({
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [reader, onToggleSettings, onToggleDarkMode, onExit, onToggleFullscreen, enabled])
+  }, [reader, onToggleSettings, onToggleDarkMode, onExit, onToggleFullscreen, onCycleSpeed, enabled])
 }

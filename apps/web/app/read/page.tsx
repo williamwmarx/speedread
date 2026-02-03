@@ -109,6 +109,16 @@ function ReaderContent(): React.ReactElement {
     }
   }, [])
 
+  // Speed presets
+  const SPEED_PRESETS = [400, 600]
+  const cycleSpeed = useCallback(() => {
+    const currentIndex = SPEED_PRESETS.indexOf(reader.wpm)
+    const nextIndex = currentIndex === -1 ? 0 : (currentIndex + 1) % SPEED_PRESETS.length
+    const newWpm = SPEED_PRESETS[nextIndex]
+    reader.setWpm(newWpm)
+    updateSettings({ wpm: newWpm })
+  }, [reader, updateSettings])
+
   // Keyboard shortcuts
   useKeyboard({
     reader,
@@ -116,15 +126,15 @@ function ReaderContent(): React.ReactElement {
     onToggleDarkMode: () => setTheme(theme === 'dark' ? 'light' : 'dark'),
     onExit: () => router.push('/'),
     onToggleFullscreen: toggleFullscreen,
+    onCycleSpeed: cycleSpeed,
     enabled: !settingsOpen,
   })
 
-  // Sync WPM changes to settings
-  const handleWpmChange = useCallback(
-    (delta: number) => {
-      const newWpm = Math.max(100, Math.min(1000, reader.wpm + delta))
-      reader.setWpm(newWpm)
-      updateSettings({ wpm: newWpm })
+  // Set WPM from preset
+  const handleWpmSet = useCallback(
+    (wpm: number) => {
+      reader.setWpm(wpm)
+      updateSettings({ wpm })
     },
     [reader, updateSettings]
   )
@@ -160,7 +170,7 @@ function ReaderContent(): React.ReactElement {
           onRestart={reader.restart}
           onPrev={() => reader.prev(5)}
           onNext={() => reader.next(5)}
-          onWpmChange={handleWpmChange}
+          onWpmSet={handleWpmSet}
           onSettingsToggle={() => setSettingsOpen(true)}
           onExit={() => router.push('/')}
           visible={controlsVisible || settingsOpen}
