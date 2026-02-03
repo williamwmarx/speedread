@@ -133,7 +133,14 @@ function ReaderContent(): React.ReactElement {
     <div className="flex h-svh flex-col">
       {/* Main display area */}
       <div className="relative flex-1">
-        <RSVPDisplay token={reader.currentToken} settings={settings} isPlaying={reader.status === 'playing'} wpm={reader.wpm} />
+        <RSVPDisplay
+          token={reader.currentToken}
+          settings={settings}
+          isPlaying={reader.status === 'playing'}
+          wpm={reader.wpm}
+          onToggle={reader.toggle}
+          onJumpSentences={reader.jumpSentences}
+        />
       </div>
 
       {/* Bottom controls */}

@@ -51,6 +51,7 @@ export type ReaderAction =
   | { type: 'next'; count?: number }
   | { type: 'prev'; count?: number }
   | { type: 'jump-sentence'; direction: 'next' | 'prev' }
+  | { type: 'jump-sentences'; direction: 'next' | 'prev'; count: number }
   | { type: 'jump-paragraph'; direction: 'next' | 'prev' }
   | { type: 'restart' }
   | { type: 'set-wpm'; wpm: number }

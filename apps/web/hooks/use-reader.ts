@@ -86,6 +86,30 @@ function reducer(state: State, action: ReaderAction): State {
       }
     }
 
+    case 'jump-sentences': {
+      let newIndex = state.currentIndex
+      let jumps = 0
+
+      if (action.direction === 'next') {
+        for (let i = state.currentIndex + 1; i < state.tokens.length && jumps < action.count; i++) {
+          if (state.tokens[i].meta.sentenceStart) {
+            newIndex = i
+            jumps++
+          }
+        }
+      } else {
+        for (let i = state.currentIndex - 1; i >= 0 && jumps < action.count; i--) {
+          if (state.tokens[i].meta.sentenceStart) {
+            newIndex = i
+            jumps++
+          }
+        }
+        if (jumps === 0) newIndex = 0
+      }
+
+      return { ...state, currentIndex: newIndex, status: state.status === 'finished' ? 'paused' : state.status }
+    }
+
     case 'jump-paragraph': {
       if (action.direction === 'next') {
         // Find next paragraph start
@@ -131,6 +155,7 @@ export interface UseReaderReturn {
   next: (count?: number) => void
   prev: (count?: number) => void
   jumpSentence: (direction: 'next' | 'prev') => void
+  jumpSentences: (direction: 'next' | 'prev', count: number) => void
   jumpParagraph: (direction: 'next' | 'prev') => void
   restart: () => void
   setWpm: (wpm: number) => void
@@ -189,6 +214,7 @@ export function useReader(settings: ReaderSettings): UseReaderReturn {
     next: useCallback((count?: number) => dispatch({ type: 'next', count }), []),
     prev: useCallback((count?: number) => dispatch({ type: 'prev', count }), []),
     jumpSentence: useCallback((direction: 'next' | 'prev') => dispatch({ type: 'jump-sentence', direction }), []),
+    jumpSentences: useCallback((direction: 'next' | 'prev', count: number) => dispatch({ type: 'jump-sentences', direction, count }), []),
     jumpParagraph: useCallback((direction: 'next' | 'prev') => dispatch({ type: 'jump-paragraph', direction }), []),
     restart: useCallback(() => dispatch({ type: 'restart' }), []),
     setWpm: useCallback((wpm: number) => dispatch({ type: 'set-wpm', wpm }), []),
