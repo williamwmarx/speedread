@@ -6,8 +6,7 @@ interface PageProps {
 }
 
 async function fetchContent(uuid: string): Promise<ContentRetrieveResponse | null> {
-  // In production, this would be the actual API URL
-  const apiUrl = process.env.API_URL || 'https://read.marx.sh'
+  const apiUrl = process.env.API_URL || 'https://read-api.marx.sh'
 
   try {
     const res = await fetch(`${apiUrl}/api/content/${uuid}`, {
