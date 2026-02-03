@@ -22,6 +22,7 @@ const fontSizeClasses: Record<ReaderSettings['fontSize'], string> = {
 }
 
 type TapZone = 'left' | 'center' | 'right'
+type FeedbackType = 'play' | 'pause' | 'rewind' | 'forward' | null
 
 export function RSVPDisplay({
   token,
@@ -37,8 +38,8 @@ export function RSVPDisplay({
   const lastClickRef = useRef<{ time: number; zone: TapZone } | null>(null)
   const clickTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  // Visual feedback for double-tap
-  const [feedbackZone, setFeedbackZone] = useState<TapZone | null>(null)
+  // Visual feedback state
+  const [feedback, setFeedback] = useState<FeedbackType>(null)
 
   const getZone = useCallback((clientX: number, containerWidth: number): TapZone => {
     const third = containerWidth / 3
@@ -47,9 +48,18 @@ export function RSVPDisplay({
     return 'center'
   }, [])
 
-  const showFeedback = useCallback((zone: TapZone) => {
-    setFeedbackZone(zone)
-    setTimeout(() => setFeedbackZone(null), 200)
+  const showFeedback = useCallback((type: FeedbackType, action?: () => void, immediate = false) => {
+    setFeedback(type)
+    // Hide overlay after 500ms
+    setTimeout(() => setFeedback(null), 500)
+    // Fire action - immediate for pause, delayed for play
+    if (action) {
+      if (immediate) {
+        action()
+      } else {
+        setTimeout(action, 700)
+      }
+    }
   }, [])
 
   const handleClick = useCallback(
@@ -72,14 +82,13 @@ export function RSVPDisplay({
         lastClickRef.current = null
 
         if (zone === 'left') {
-          showFeedback('left')
-          onJumpSentences('prev', 3)
+          showFeedback('rewind', () => onJumpSentences('prev', 3), true)
         } else if (zone === 'right') {
-          showFeedback('right')
-          onJumpSentences('next', 3)
+          showFeedback('forward', () => onJumpSentences('next', 3), true)
         } else {
           // Double-click center = toggle (same as single)
-          onToggle()
+          // Pause immediately, delay play
+          showFeedback(isPlaying ? 'pause' : 'play', onToggle, isPlaying)
         }
         return
       }
@@ -94,14 +103,15 @@ export function RSVPDisplay({
       clickTimeoutRef.current = setTimeout(() => {
         // Single click confirmed
         if (zone === 'center') {
-          onToggle()
+          // Pause immediately, delay play
+          showFeedback(isPlaying ? 'pause' : 'play', onToggle, isPlaying)
         }
         // Single click on left/right does nothing (wait for double)
         lastClickRef.current = null
         clickTimeoutRef.current = null
       }, 300)
     },
-    [getZone, onToggle, onJumpSentences, showFeedback]
+    [getZone, onToggle, onJumpSentences, showFeedback, isPlaying]
   )
 
   return (
@@ -109,21 +119,60 @@ export function RSVPDisplay({
       className="relative flex h-full w-full cursor-pointer flex-col items-center justify-center overflow-hidden bg-[hsl(var(--background))]"
       onClick={handleClick}
     >
-      {/* Double-tap feedback overlays */}
+      {/* Rewind feedback - curved on right edge */}
       <div
         className={cn(
-          'pointer-events-none absolute inset-y-0 left-0 w-1/3 bg-white/10 transition-opacity duration-200',
-          feedbackZone === 'left' ? 'opacity-100' : 'opacity-0'
+          'pointer-events-none absolute inset-y-0 left-0 flex w-1/3 items-center justify-center bg-[hsl(var(--foreground))]/10 transition-opacity duration-300',
+          feedback === 'rewind' ? 'opacity-100' : 'opacity-0'
         )}
+        style={{ borderRadius: '0 50% 50% 0' }}
         aria-hidden="true"
-      />
+      >
+        <div className="flex items-center gap-1 text-[hsl(var(--foreground))]/70">
+          <svg className="h-8 w-8" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M11 18V6l-8.5 6 8.5 6zm.5-6l8.5 6V6l-8.5 6z" />
+          </svg>
+          <span className="text-sm font-medium">3</span>
+        </div>
+      </div>
+
+      {/* Forward feedback - curved on left edge */}
       <div
         className={cn(
-          'pointer-events-none absolute inset-y-0 right-0 w-1/3 bg-white/10 transition-opacity duration-200',
-          feedbackZone === 'right' ? 'opacity-100' : 'opacity-0'
+          'pointer-events-none absolute inset-y-0 right-0 flex w-1/3 items-center justify-center bg-[hsl(var(--foreground))]/10 transition-opacity duration-300',
+          feedback === 'forward' ? 'opacity-100' : 'opacity-0'
+        )}
+        style={{ borderRadius: '50% 0 0 50%' }}
+        aria-hidden="true"
+      >
+        <div className="flex items-center gap-1 text-[hsl(var(--foreground))]/70">
+          <span className="text-sm font-medium">3</span>
+          <svg className="h-8 w-8" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M4 18l8.5-6L4 6v12zm9-12v12l8.5-6L13 6z" />
+          </svg>
+        </div>
+      </div>
+
+      {/* Play/Pause feedback - center with backdrop blur */}
+      <div
+        className={cn(
+          'pointer-events-none absolute inset-0 z-50 flex items-center justify-center backdrop-blur-sm transition-all duration-300',
+          feedback === 'play' || feedback === 'pause' ? 'opacity-100' : 'opacity-0 backdrop-blur-none'
         )}
         aria-hidden="true"
-      />
+      >
+        <div className="rounded-full bg-[hsl(var(--background))]/80 p-6 shadow-lg">
+          {feedback === 'play' ? (
+            <svg className="h-16 w-16 text-[hsl(var(--foreground))]" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M8 5v14l11-7z" />
+            </svg>
+          ) : (
+            <svg className="h-16 w-16 text-[hsl(var(--foreground))]" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
+            </svg>
+          )}
+        </div>
+      </div>
 
       {/* Subtle radial gradient for depth - draws eye to center */}
       <div
