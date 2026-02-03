@@ -133,7 +133,7 @@ function ReaderContent(): React.ReactElement {
     <div className="flex h-svh flex-col">
       {/* Main display area */}
       <div className="relative flex-1">
-        <RSVPDisplay token={reader.currentToken} settings={settings} isPlaying={reader.status === 'playing'} />
+        <RSVPDisplay token={reader.currentToken} settings={settings} isPlaying={reader.status === 'playing'} wpm={reader.wpm} />
       </div>
 
       {/* Bottom controls */}

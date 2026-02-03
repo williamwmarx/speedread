@@ -4,6 +4,7 @@
   --color-accent: #ef4444;
   --color-accent-hover: #dc2626;
 
+  --font-serif: Georgia, 'Times New Roman', Times, serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
 
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
@@ -20,11 +21,11 @@
   }
 
   .dark {
-    --background: 0 0% 3.9%;
+    --background: 0 0% 0%;
     --foreground: 0 0% 98%;
-    --muted: 0 0% 14.9%;
-    --muted-foreground: 0 0% 63.9%;
-    --border: 0 0% 14.9%;
+    --muted: 0 0% 10%;
+    --muted-foreground: 0 0% 50%;
+    --border: 0 0% 20%;
     --ring: 0 0% 83.1%;
   }
 }
@@ -42,7 +43,6 @@
 /* RSVP-specific styles */
 .rsvp-word {
   font-variant-numeric: tabular-nums;
-  letter-spacing: 0.05em;
 }
 
 /* Hide scrollbar but allow scrolling */
