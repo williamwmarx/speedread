@@ -1,0 +1,14 @@
+{
+  "name": "speedread",
+  "private": true,
+  "workspaces": ["apps/*", "packages/*"],
+  "scripts": {
+    "dev": "bun run --filter @speedread/web dev",
+    "build": "bun run --filter @speedread/web build",
+    "start": "bun run --filter @speedread/web start",
+    "lint": "bun run --filter '*' lint",
+    "test": "bun run --filter '*' test",
+    "api:dev": "bun run --filter @speedread/api dev",
+    "api:deploy": "bun run --filter @speedread/api deploy"
+  }
+}

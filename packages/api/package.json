@@ -1,0 +1,17 @@
+{
+  "name": "@speedread/api",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "test": "echo 'No tests yet'"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250124.0",
+    "wrangler": "^4.2.0"
+  },
+  "dependencies": {
+    "@speedread/shared": "workspace:*"
+  }
+}
