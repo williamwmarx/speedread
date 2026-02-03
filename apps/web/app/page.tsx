@@ -22,7 +22,7 @@ export default function HomePage(): React.ReactElement {
   }
 
   return (
-    <main className="flex min-h-svh flex-col items-center px-4 pb-24 pt-[18vh]">
+    <main className="flex min-h-svh flex-col items-center px-4 pb-24 pt-[6vh]">
       <div className="w-full max-w-xl">
         {/* Header */}
         <header className="animate-fade-up mb-10 text-center">
