@@ -229,18 +229,7 @@ export function RSVPDisplay({
           aria-atomic="true"
         >
           <span className="select-none text-right text-[hsl(var(--foreground))]">{before}</span>
-          <span
-            className="relative select-none"
-            style={{ color: settings.orpColor }}
-          >
-            {/* Subtle glow behind ORP character */}
-            <span
-              className="absolute inset-0 blur-sm"
-              style={{ color: settings.orpColor, opacity: 0.4 }}
-              aria-hidden="true"
-            >
-              {orp}
-            </span>
+          <span className="select-none" style={{ color: settings.orpColor }}>
             {orp}
           </span>
           <span className="select-none text-left text-[hsl(var(--foreground))]">{after}</span>
