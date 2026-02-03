@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback, Suspense } from 'react'
+import { useEffect, useState, useCallback, useMemo, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useTheme } from 'next-themes'
 import { RSVPDisplay } from '@/components/reader/rsvp-display'
@@ -23,6 +23,11 @@ function ReaderContent(): React.ReactElement {
   const { settings, updateSettings } = useSettings()
   const { getText } = useRecentTexts()
   const reader = useReader(settings)
+
+  const longestWord = useMemo(
+    () => reader.tokens.reduce((max, t) => (t.text.length > max.length ? t.text : max), ''),
+    [reader.tokens]
+  )
 
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [previewOpen, setPreviewOpen] = useState(false)
@@ -166,6 +171,7 @@ function ReaderContent(): React.ReactElement {
           settings={settings}
           isPlaying={reader.status === 'playing'}
           wpm={reader.wpm}
+          longestWord={longestWord}
           onToggle={reader.toggle}
           onJumpSentences={reader.jumpSentences}
         />

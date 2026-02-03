@@ -3,6 +3,8 @@
 import { useRef, useCallback, useState } from 'react'
 import type { Token, ReaderSettings } from '@speedread/shared'
 import { splitAtORP } from '@/lib/orp'
+import { useFitFontSize } from '@/hooks/use-fit-font-size'
+import { fontSizeClasses } from '@/lib/font-sizes'
 import { cn } from '@/lib/cn'
 
 interface RSVPDisplayProps {
@@ -10,15 +12,9 @@ interface RSVPDisplayProps {
   settings: ReaderSettings
   isPlaying: boolean
   wpm: number
+  longestWord: string
   onToggle: () => void
   onJumpSentences: (direction: 'next' | 'prev', count: number) => void
-}
-
-const fontSizeClasses: Record<ReaderSettings['fontSize'], string> = {
-  sm: 'text-4xl md:text-5xl',
-  md: 'text-5xl md:text-6xl',
-  lg: 'text-6xl md:text-7xl',
-  xl: 'text-7xl md:text-8xl',
 }
 
 type TapZone = 'left' | 'center' | 'right'
@@ -29,10 +25,12 @@ export function RSVPDisplay({
   settings,
   isPlaying,
   wpm,
+  longestWord,
   onToggle,
   onJumpSentences,
 }: RSVPDisplayProps): React.ReactElement {
   const [before, orp, after] = token ? splitAtORP(token.text) : ['', '', '']
+  const fontSizeOverride = useFitFontSize(longestWord, settings.fontSize)
 
   // Track clicks for single/double click detection
   const lastClickRef = useRef<{ time: number; zone: TapZone } | null>(null)
@@ -223,7 +221,7 @@ export function RSVPDisplay({
       {token ? (
         <div
           className={cn('rsvp-word pointer-events-none grid w-full max-w-[90vw] px-4 font-sans', fontSizeClasses[settings.fontSize])}
-          style={{ gridTemplateColumns: '1fr auto 1fr' }}
+          style={{ gridTemplateColumns: '1fr auto 1fr', ...(fontSizeOverride != null && { fontSize: fontSizeOverride + 'px' }) }}
           role="status"
           aria-live="off"
           aria-atomic="true"
