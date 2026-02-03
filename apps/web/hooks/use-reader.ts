@@ -15,7 +15,7 @@ const initialState: State = {
   status: 'idle',
   tokens: [],
   currentIndex: 0,
-  wpm: 300,
+  wpm: 400,
 }
 
 function reducer(state: State, action: ReaderAction): State {

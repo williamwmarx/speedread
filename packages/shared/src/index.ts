@@ -17,26 +17,26 @@ export interface TokenMeta {
 
 // Reader settings persisted to localStorage
 export interface ReaderSettings {
-  wpm: number // 100-1000, default 300
+  wpm: number // 100-1000, default 400
   chunkSize: number // 1-5, default 1
-  sentencePauseMultiplier: number // default 3
+  sentencePauseMultiplier: number // default 2.5
   paragraphPauseMultiplier: number // default 4
   commaPauseMultiplier: number // default 2
   adaptiveTiming: boolean // default true
   theme: 'light' | 'dark' | 'system' // default 'system'
-  orpColor: string // default '#ef4444' (red-500)
+  orpColor: string // default '#e63946'
   fontSize: 'sm' | 'md' | 'lg' | 'xl' // default 'lg'
 }
 
 export const DEFAULT_SETTINGS: ReaderSettings = {
-  wpm: 300,
+  wpm: 400,
   chunkSize: 1,
-  sentencePauseMultiplier: 3,
+  sentencePauseMultiplier: 2.5,
   paragraphPauseMultiplier: 4,
   commaPauseMultiplier: 2,
   adaptiveTiming: true,
   theme: 'system',
-  orpColor: '#ef4444',
+  orpColor: '#e63946',
   fontSize: 'lg',
 }
 
