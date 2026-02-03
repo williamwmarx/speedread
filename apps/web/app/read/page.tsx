@@ -15,6 +15,8 @@ import { useRecentTexts } from '@/hooks/use-recent-texts'
 import { parseText, chunkTokens } from '@/lib/parser'
 import { cn } from '@/lib/cn'
 
+const SPEED_PRESETS = [400, 600]
+
 function ReaderContent(): React.ReactElement {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -32,8 +34,7 @@ function ReaderContent(): React.ReactElement {
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [previewOpen, setPreviewOpen] = useState(false)
   const [controlsVisible, setControlsVisible] = useState(true)
-  const [lastActivity, setLastActivity] = useState(Date.now())
-
+  const [lastActivity, setLastActivity] = useState(() => Date.now())
 
   // Load text from localStorage
   useEffect(() => {
@@ -55,15 +56,8 @@ function ReaderContent(): React.ReactElement {
     const tokens = parseText(content)
     const chunked = chunkTokens(tokens, settings.chunkSize)
     reader.load(chunked)
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- reader.load is stable (useCallback with [] deps) but the reader object is a new ref each render
   }, [searchParams, getText, router, settings.chunkSize])
-
-  // Handle chunk size changes - re-parse tokens
-  useEffect(() => {
-    if (reader.tokens.length === 0) return
-
-    // We need the original text to re-chunk - for now just use single tokens
-    // This is a simplified implementation
-  }, [settings.chunkSize])
 
   // Auto-hide controls after 2s of playing
   useEffect(() => {
@@ -118,8 +112,6 @@ function ReaderContent(): React.ReactElement {
     }
   }, [])
 
-  // Speed presets
-  const SPEED_PRESETS = [400, 600]
   const cycleSpeed = useCallback(() => {
     const currentIndex = SPEED_PRESETS.indexOf(reader.wpm)
     const nextIndex = currentIndex === -1 ? 0 : (currentIndex + 1) % SPEED_PRESETS.length

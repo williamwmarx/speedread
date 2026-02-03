@@ -13,6 +13,7 @@ export function useFitFontSize(
   const spanRef = useRef<HTMLSpanElement | null>(null)
   const rafRef = useRef<number>(0)
 
+  /* eslint-disable react-hooks/set-state-in-effect -- DOM measurement requires setState in effect */
   useEffect(() => {
     if (!longestWord) {
       setOverride(undefined)
@@ -60,6 +61,7 @@ export function useFitFontSize(
       }
     }
   }, [longestWord, fontSize])
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   return override
 }

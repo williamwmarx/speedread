@@ -1,33 +1,41 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useSyncExternalStore, useCallback } from 'react'
 import type { ReaderSettings } from '@speedread/shared'
 import { DEFAULT_SETTINGS } from '@speedread/shared'
 
 const STORAGE_KEY = 'speedread-settings'
 
-function loadSettings(): ReaderSettings {
-  if (typeof window === 'undefined') return DEFAULT_SETTINGS
+const listeners = new Set<() => void>()
 
+function emitChange(): void {
+  listeners.forEach((l) => l())
+}
+
+function subscribe(callback: () => void): () => void {
+  listeners.add(callback)
+  return () => listeners.delete(callback)
+}
+
+// undefined (not null) forces first getSnapshot() call to read localStorage
+let cachedRaw: string | null | undefined
+let cachedSettings: ReaderSettings = DEFAULT_SETTINGS
+
+function getSnapshot(): ReaderSettings {
   try {
-    const stored = localStorage.getItem(STORAGE_KEY)
-    if (!stored) return DEFAULT_SETTINGS
-
-    const parsed = JSON.parse(stored) as Partial<ReaderSettings>
-    return { ...DEFAULT_SETTINGS, ...parsed }
+    const raw = localStorage.getItem(STORAGE_KEY)
+    if (raw !== cachedRaw) {
+      cachedRaw = raw
+      cachedSettings = raw ? { ...DEFAULT_SETTINGS, ...JSON.parse(raw) } : DEFAULT_SETTINGS
+    }
+    return cachedSettings
   } catch {
     return DEFAULT_SETTINGS
   }
 }
 
-function saveSettings(settings: ReaderSettings): void {
-  if (typeof window === 'undefined') return
-
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(settings))
-  } catch {
-    // localStorage might be full or disabled
-  }
+function getServerSnapshot(): ReaderSettings {
+  return DEFAULT_SETTINGS
 }
 
 export function useSettings(): {
@@ -35,28 +43,27 @@ export function useSettings(): {
   updateSettings: (update: Partial<ReaderSettings>) => void
   resetSettings: () => void
 } {
-  const [settings, setSettings] = useState<ReaderSettings>(DEFAULT_SETTINGS)
-  const [mounted, setMounted] = useState(false)
-
-  // Load settings on mount
-  useEffect(() => {
-    setSettings(loadSettings())
-    setMounted(true)
-  }, [])
-
-  // Save settings when they change (but not on initial mount)
-  useEffect(() => {
-    if (mounted) {
-      saveSettings(settings)
-    }
-  }, [settings, mounted])
+  const settings = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot)
 
   const updateSettings = useCallback((update: Partial<ReaderSettings>) => {
-    setSettings((prev) => ({ ...prev, ...update }))
+    const updated = { ...getSnapshot(), ...update }
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated))
+    } catch {
+      // localStorage might be full or disabled
+    }
+    cachedRaw = undefined // invalidate cache
+    emitChange()
   }, [])
 
   const resetSettings = useCallback(() => {
-    setSettings(DEFAULT_SETTINGS)
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_SETTINGS))
+    } catch {
+      // localStorage might be full or disabled
+    }
+    cachedRaw = undefined
+    emitChange()
   }, [])
 
   return { settings, updateSettings, resetSettings }
