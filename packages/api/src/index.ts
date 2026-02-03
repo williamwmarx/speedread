@@ -42,7 +42,7 @@ async function checkRateLimit(
   maxRequests: number,
   windowSeconds: number
 ): Promise<boolean> {
-  const key = `rate:${ip}`
+  const key = `SPEEDREAD_rate:${ip}`
   const now = Math.floor(Date.now() / 1000)
   const windowStart = now - windowSeconds
 
@@ -94,7 +94,6 @@ async function handlePost(request: Request, env: Env, cors: Record<string, strin
   const stored: StoredContent = {
     text: body.text,
     createdAt: now,
-    source: body.source,
   }
 
   await env.CONTENT_KV.put(`content:${uuid}`, JSON.stringify(stored), { expirationTtl: ttl })

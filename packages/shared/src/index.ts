@@ -61,12 +61,10 @@ export type ReaderAction =
 export interface StoredContent {
   text: string
   createdAt: number
-  source?: string
 }
 
 export interface ContentSubmitRequest {
   text: string
-  source?: string
 }
 
 export interface ContentSubmitResponse {

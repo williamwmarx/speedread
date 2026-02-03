@@ -4,11 +4,11 @@ compatibility_date = "2025-01-29"
 
 [[kv_namespaces]]
 binding = "CONTENT_KV"
-id = "placeholder_content_kv_id"
+id = "0a32a0b8ffbc4e02950131a8e8ca854c"
 
 [[kv_namespaces]]
 binding = "RATE_LIMIT_KV"
-id = "placeholder_rate_limit_kv_id"
+id = "ed6d080f2a54424b87929b1c270301e7"
 
 [vars]
 ALLOWED_ORIGIN = "https://read.marx.sh"
