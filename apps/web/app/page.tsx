@@ -22,24 +22,62 @@ export default function HomePage(): React.ReactElement {
   }
 
   return (
-    <main className="mx-auto flex min-h-svh max-w-2xl flex-col px-4 py-8">
-      <header className="mb-8 text-center">
-        <h1 className="text-3xl font-bold">SpeedRead</h1>
-        <p className="mt-2 text-[hsl(var(--muted-foreground))]">Read faster with RSVP</p>
-      </header>
+    <main className="flex min-h-svh flex-col items-center px-4 pb-24 pt-[18vh]">
+      <div className="w-full max-w-xl">
+        {/* Header */}
+        <header className="animate-fade-up mb-10 text-center">
+          <h1 className="text-5xl font-bold tracking-tight md:text-6xl">
+            Speed<span className="text-accent">Read</span>
+          </h1>
+          <p className="mx-auto mt-4 max-w-sm text-sm leading-relaxed text-[hsl(var(--muted-foreground))]">
+            Read faster with{' '}
+            <a
+              href="https://en.wikipedia.org/wiki/Rapid_serial_visual_presentation"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline underline-offset-2 hover:text-[hsl(var(--foreground))]"
+            >
+              RSVP
+            </a>
+            . Private by design. Open source. Read the code{' '}
+            <a
+              href="https://github.com/williamwmarx/speedread"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline underline-offset-2 hover:text-[hsl(var(--foreground))]"
+            >
+              on GitHub
+            </a>
+            .
+          </p>
+        </header>
 
-      <TextInput onSubmit={handleSubmit} className="mb-8" />
+        {/* Decorative line echoing reader guide lines */}
+        <div
+          className="animate-fade-up mx-auto mb-10 h-px w-full max-w-xs"
+          style={{
+            animationDelay: '80ms',
+            background:
+              'linear-gradient(90deg, transparent 0%, hsl(var(--border)) 30%, hsl(var(--border)) 70%, transparent 100%)',
+          }}
+          aria-hidden="true"
+        />
 
-      <RecentTexts
-        texts={recentTexts}
-        onSelect={handleSelectRecent}
-        onRemove={removeText}
-        onClearAll={clearAll}
-      />
+        {/* Text input */}
+        <div className="animate-fade-up" style={{ animationDelay: '150ms' }}>
+          <TextInput onSubmit={handleSubmit} className="mb-8" />
+        </div>
 
-      <footer className="mt-auto pt-8 text-center text-xs text-[hsl(var(--muted-foreground))]">
-        <p>Paste text or share from another app to start reading</p>
-      </footer>
+        {/* Recent texts */}
+        <div className="animate-fade-up" style={{ animationDelay: '220ms' }}>
+          <RecentTexts
+            texts={recentTexts}
+            onSelect={handleSelectRecent}
+            onRemove={removeText}
+            onClearAll={clearAll}
+          />
+        </div>
+      </div>
     </main>
   )
 }

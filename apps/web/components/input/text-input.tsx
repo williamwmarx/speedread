@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/cn'
 
 interface TextInputProps {
@@ -23,24 +22,28 @@ export function TextInput({ onSubmit, className }: TextInputProps): React.ReactE
   const wordCount = text.trim().split(/\s+/).filter(Boolean).length
 
   return (
-    <form onSubmit={handleSubmit} className={cn('space-y-4', className)}>
+    <form onSubmit={handleSubmit} className={cn('space-y-3', className)}>
       <div className="relative">
         <textarea
           value={text}
           onChange={(e) => setText(e.target.value)}
           placeholder="Paste your text here..."
-          className="h-64 w-full resize-none rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--background))] p-4 text-base placeholder:text-[hsl(var(--muted-foreground))] focus:outline-none focus:ring-2 focus:ring-[hsl(var(--ring))] focus:ring-offset-2 focus:ring-offset-[hsl(var(--background))]"
+          className="h-48 w-full resize-none rounded-lg border border-[hsl(var(--border))] bg-transparent p-4 text-sm leading-relaxed placeholder:text-[hsl(var(--muted-foreground))]/60 focus:border-accent/50 focus:outline-none focus:ring-1 focus:ring-accent/30"
           autoFocus
         />
         {wordCount > 0 && (
-          <span className="absolute bottom-3 right-3 text-sm text-[hsl(var(--muted-foreground))]">
-            {wordCount} words
+          <span className="absolute bottom-3 right-3 font-mono text-xs text-[hsl(var(--muted-foreground))]/70">
+            {wordCount} {wordCount === 1 ? 'word' : 'words'}
           </span>
         )}
       </div>
-      <Button type="submit" className="w-full" size="lg" disabled={!text.trim()}>
+      <button
+        type="submit"
+        disabled={!text.trim()}
+        className="w-full rounded-lg bg-accent py-3 text-sm font-medium text-white transition-colors hover:bg-accent-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[hsl(var(--background))] disabled:pointer-events-none disabled:opacity-40"
+      >
         Start Reading
-      </Button>
+      </button>
     </form>
   )
 }

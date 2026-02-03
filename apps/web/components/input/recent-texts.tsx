@@ -1,7 +1,6 @@
 'use client'
 
 import type { RecentText } from '@speedread/shared'
-import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/cn'
 
 interface RecentTextsProps {
@@ -39,37 +38,40 @@ export function RecentTexts({
   return (
     <div className={cn('space-y-3', className)}>
       <div className="flex items-center justify-between">
-        <h2 className="text-sm font-medium text-[hsl(var(--muted-foreground))]">Recent</h2>
-        <Button variant="ghost" size="sm" onClick={onClearAll} className="text-xs">
+        <h2 className="text-xs font-medium uppercase tracking-widest text-[hsl(var(--muted-foreground))]/70">
+          Recent
+        </h2>
+        <button
+          onClick={onClearAll}
+          className="text-xs text-[hsl(var(--muted-foreground))]/70 transition-colors hover:text-[hsl(var(--foreground))]"
+        >
           Clear all
-        </Button>
+        </button>
       </div>
-      <ul className="space-y-2">
+      <ul className="space-y-1">
         {texts.map((item) => (
           <li
             key={item.id}
-            className="group flex items-center gap-3 rounded-lg border border-[hsl(var(--border))] p-3 transition-colors hover:bg-[hsl(var(--muted))]"
+            className="group flex items-center gap-3 rounded-md px-3 py-2.5 transition-colors hover:bg-[hsl(var(--muted))]"
           >
             <button onClick={() => onSelect(item.id)} className="flex-1 text-left">
-              <p className="line-clamp-1 text-sm">{item.preview}</p>
-              <p className="mt-1 text-xs text-[hsl(var(--muted-foreground))]">
+              <p className="line-clamp-1 text-sm text-[hsl(var(--foreground))]">{item.preview}</p>
+              <p className="mt-0.5 font-mono text-xs text-[hsl(var(--muted-foreground))]/60">
                 {item.wordCount} words · {formatDate(item.createdAt)}
               </p>
             </button>
-            <Button
-              variant="ghost"
-              size="icon-sm"
+            <button
               onClick={(e) => {
                 e.stopPropagation()
                 onRemove(item.id)
               }}
-              className="opacity-0 transition-opacity group-hover:opacity-100"
+              className="rounded p-1 text-[hsl(var(--muted-foreground))]/40 opacity-0 transition-all hover:text-[hsl(var(--foreground))] group-hover:opacity-100"
               title="Remove"
             >
-              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
-            </Button>
+            </button>
           </li>
         ))}
       </ul>
