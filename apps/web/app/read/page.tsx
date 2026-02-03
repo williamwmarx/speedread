@@ -12,6 +12,7 @@ import { useSettings } from '@/hooks/use-settings'
 import { useKeyboard } from '@/hooks/use-keyboard'
 import { useRecentTexts } from '@/hooks/use-recent-texts'
 import { parseText, chunkTokens } from '@/lib/parser'
+import { cn } from '@/lib/cn'
 
 function ReaderContent(): React.ReactElement {
   const router = useRouter()
@@ -186,9 +187,14 @@ function ReaderContent(): React.ReactElement {
       />
 
       {/* Backdrop when settings open */}
-      {settingsOpen && (
-        <div className="fixed inset-0 z-40 bg-black/50" onClick={() => setSettingsOpen(false)} aria-hidden="true" />
-      )}
+      <div
+        className={cn(
+          'fixed inset-0 z-40 bg-black/50 transition-opacity duration-300 ease-out-expo',
+          settingsOpen ? 'opacity-100' : 'pointer-events-none opacity-0'
+        )}
+        onClick={() => setSettingsOpen(false)}
+        aria-hidden="true"
+      />
     </div>
   )
 }
